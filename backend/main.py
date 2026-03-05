@@ -16,6 +16,8 @@ import pdfplumber
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from openai import OpenAI
 
@@ -35,15 +37,18 @@ def get_openai_client():
     api_key = os.environ.get("OPENAI_API_KEY", "")
     base_url = os.environ.get("OPENAI_BASE_URL", "")
     if os.path.exists(config_path):
-        with open(config_path) as f:
-            cfg = yaml.safe_load(f)
-        raw_key = cfg.get("openai", {}).get("api_key", api_key)
-        # 환경변수 참조 처리
-        if raw_key.startswith("${") and raw_key.endswith("}"):
-            env_var = raw_key[2:-1]
-            raw_key = os.environ.get(env_var, api_key)
-        api_key = raw_key
-        base_url = cfg.get("openai", {}).get("base_url", base_url)
+        try:
+            with open(config_path) as f:
+                cfg = yaml.safe_load(f)
+            raw_key = cfg.get("openai", {}).get("api_key", api_key)
+            # 환경변수 참조 처리
+            if raw_key.startswith("${") and raw_key.endswith("}"):
+                env_var = raw_key[2:-1]
+                raw_key = os.environ.get(env_var, api_key)
+            api_key = raw_key
+            base_url = cfg.get("openai", {}).get("base_url", base_url)
+        except Exception:
+            pass
     return OpenAI(api_key=api_key, base_url=base_url)
 
 
@@ -288,11 +293,11 @@ SUMMARY_PROMPT = """당신은 경제 보도자료를 쉽게 풀어 쓰는 전문
 
 def generate_summary(content: str, title: str) -> str:
     """OpenAI API를 통해 요약문 생성"""
-    client = get_openai_client()
+    client, model = get_openai_client_with_config()
     prompt = SUMMARY_PROMPT.format(content=content)
 
     response = client.chat.completions.create(
-        model="gpt-5-mini",
+        model=model,
         messages=[
             {"role": "system", "content": "당신은 경제 데이터를 쉬운 언어로 풀어주는 전문가입니다."},
             {"role": "user", "content": prompt},
@@ -374,6 +379,54 @@ def save_report(report: dict):
     reports = reports[:50]
     with open(SAVE_FILE, "w", encoding="utf-8") as f:
         json.dump(reports, f, ensure_ascii=False, indent=2)
+
+
+# ─── .env 파일 로드 헬퍼 ──────────────────────────────────────────────────────
+def _load_env_file():
+    env_path = "/home/user/webapp/backend/.env"
+    if os.path.exists(env_path):
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    key, _, val = line.partition("=")
+                    if key not in os.environ:
+                        os.environ[key] = val
+
+
+# 시작 시 .env 로드
+_load_env_file()
+
+
+# ─── LLM 설정 파일 경로 ───────────────────────────────────────────────────────
+LLM_CONFIG_FILE = "/home/user/webapp/backend/.llm_config.json"
+
+
+def load_llm_config() -> dict:
+    if os.path.exists(LLM_CONFIG_FILE):
+        with open(LLM_CONFIG_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+
+def save_llm_config(config: dict):
+    with open(LLM_CONFIG_FILE, "w") as f:
+        json.dump(config, f, ensure_ascii=False, indent=2)
+
+
+def get_openai_client_with_config():
+    """저장된 LLM 설정을 사용해 OpenAI 클라이언트 반환"""
+    cfg = load_llm_config()
+    api_key = cfg.get("api_key", "")
+    base_url = cfg.get("base_url", "https://api.openai.com/v1")
+    model = cfg.get("model", "gpt-4o-mini")
+    if not api_key:
+        # 환경변수 fallback
+        api_key = os.environ.get("OPENAI_API_KEY", "")
+        base_url = os.environ.get("OPENAI_BASE_URL", base_url)
+    if not api_key:
+        raise ValueError("LLM API Key가 설정되지 않았습니다. 설정 탭에서 API Key를 입력해주세요.")
+    return OpenAI(api_key=api_key, base_url=base_url), model
 
 
 # ─── API 엔드포인트 ────────────────────────────────────────────────────────────
@@ -521,22 +574,91 @@ async def set_smtp_config(req: SmtpConfigRequest):
 @app.get("/api/smtp-status")
 async def smtp_status():
     """SMTP 설정 상태 확인"""
-    # .env 파일 로드
-    env_path = "/home/user/webapp/backend/.env"
-    if os.path.exists(env_path):
-        with open(env_path) as f:
-            for line in f:
-                if "=" in line:
-                    k, v = line.strip().split("=", 1)
-                    if k not in os.environ:
-                        os.environ[k] = v
-
+    _load_env_file()
     user = os.environ.get("SMTP_USER", "")
     return {
         "configured": bool(user and os.environ.get("SMTP_PASS")),
         "smtp_user": user,
         "smtp_host": os.environ.get("SMTP_HOST", "smtp.naver.com"),
     }
+
+
+# ─── LLM 설정 API ─────────────────────────────────────────────────────────────
+
+class LlmConfigRequest(BaseModel):
+    api_key: str
+    base_url: str = "https://api.openai.com/v1"
+    model: str = "gpt-4o-mini"
+
+
+@app.get("/api/llm-status")
+async def llm_status():
+    """LLM 설정 상태 확인"""
+    cfg = load_llm_config()
+    api_key = cfg.get("api_key", "")
+    if api_key:
+        hint = api_key[:8] if len(api_key) >= 8 else api_key[:4]
+        return {
+            "configured": True,
+            "api_key_hint": hint,
+            "model": cfg.get("model", "gpt-4o-mini"),
+            "base_url": cfg.get("base_url", "https://api.openai.com/v1"),
+        }
+    return {"configured": False}
+
+
+@app.post("/api/llm-config")
+async def set_llm_config(req: LlmConfigRequest):
+    """LLM API Key 저장 및 테스트"""
+    # 테스트 호출
+    try:
+        test_client = OpenAI(api_key=req.api_key, base_url=req.base_url)
+        test_resp = test_client.chat.completions.create(
+            model=req.model,
+            messages=[{"role": "user", "content": "안녕하세요. 한 문장으로 짧게 답해주세요."}],
+            max_tokens=50,
+            temperature=0.1,
+        )
+        test_response = test_resp.choices[0].message.content.strip()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"API Key 검증 실패: {str(e)}")
+
+    # 검증 성공 시 저장
+    save_llm_config({
+        "api_key": req.api_key,
+        "base_url": req.base_url,
+        "model": req.model,
+        "saved_at": datetime.now().isoformat(),
+    })
+    return {"success": True, "test_response": test_response, "model": req.model}
+
+
+@app.delete("/api/llm-config")
+async def delete_llm_config():
+    """저장된 LLM API Key 삭제"""
+    if os.path.exists(LLM_CONFIG_FILE):
+        os.remove(LLM_CONFIG_FILE)
+    return {"success": True}
+
+
+# ─── 프론트엔드 정적 파일 서빙 ──────────────────────────────────────────────────
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+STATIC_DIR = os.path.normpath(STATIC_DIR)
+
+if os.path.isdir(STATIC_DIR):
+    app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_DIR, "assets")), name="assets")
+
+    @app.get("/")
+    async def serve_index():
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        # API 요청은 위에서 처리됨; 나머지는 SPA index.html 반환
+        file_path = os.path.join(STATIC_DIR, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
 if __name__ == "__main__":

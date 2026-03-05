@@ -3,7 +3,7 @@ import Header from './components/Header.jsx'
 import ScrapePanel from './components/ScrapePanel.jsx'
 import SummaryViewer from './components/SummaryViewer.jsx'
 import SavedReports from './components/SavedReports.jsx'
-import SmtpConfig from './components/SmtpConfig.jsx'
+import Settings from './components/Settings.jsx'
 import Toast from './components/Toast.jsx'
 import './styles/app.css'
 
@@ -13,6 +13,7 @@ export default function App() {
   const [report, setReport] = useState(null)
   const [savedReports, setSavedReports] = useState([])
   const [smtpConfigured, setSmtpConfigured] = useState(false)
+  const [llmConfigured, setLlmConfigured] = useState(false)
   const [toast, setToast] = useState(null)
 
   const showToast = useCallback((message, type = 'success') => {
@@ -23,16 +24,14 @@ export default function App() {
   useEffect(() => {
     fetchSavedReports()
     checkSmtpStatus()
+    checkLlmStatus()
   }, [])
 
   const fetchSavedReports = async () => {
     try {
       const res = await fetch('/api/saved-reports')
-      if (res.ok) {
-        const data = await res.json()
-        setSavedReports(data)
-      }
-    } catch (e) { /* ignore */ }
+      if (res.ok) setSavedReports(await res.json())
+    } catch {}
   }
 
   const checkSmtpStatus = async () => {
@@ -42,10 +41,25 @@ export default function App() {
         const data = await res.json()
         setSmtpConfigured(data.configured)
       }
-    } catch (e) { /* ignore */ }
+    } catch {}
+  }
+
+  const checkLlmStatus = async () => {
+    try {
+      const res = await fetch('/api/llm-status')
+      if (res.ok) {
+        const data = await res.json()
+        setLlmConfigured(data.configured)
+      }
+    } catch {}
   }
 
   const handleScrape = async (email, sendEmail) => {
+    if (!llmConfigured) {
+      showToast('⚠️ 먼저 설정 탭에서 LLM API Key를 등록해주세요', 'warning')
+      setActiveTab('settings')
+      return
+    }
     setLoading(true)
     setReport(null)
     try {
@@ -87,14 +101,14 @@ export default function App() {
       if (!res.ok) throw new Error('저장 실패')
       showToast('✅ 보고서가 저장되었습니다', 'success')
       await fetchSavedReports()
-    } catch (e) {
+    } catch {
       showToast('저장 중 오류가 발생했습니다', 'error')
     }
   }
 
   const handleSendEmail = async (title, summary, email) => {
     if (!smtpConfigured) {
-      showToast('⚠️ 먼저 이메일 설정을 완료해주세요', 'warning')
+      showToast('⚠️ 먼저 설정 탭에서 이메일(SMTP) 설정을 완료해주세요', 'warning')
       setActiveTab('settings')
       return
     }
@@ -114,9 +128,12 @@ export default function App() {
     }
   }
 
+  const handleLlmSaved = (configured) => {
+    setLlmConfigured(configured)
+  }
+
   const handleSmtpSaved = (configured) => {
     setSmtpConfigured(configured)
-    showToast('✅ 이메일 설정이 저장되었습니다', 'success')
   }
 
   return (
@@ -125,16 +142,23 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         smtpConfigured={smtpConfigured}
+        llmConfigured={llmConfigured}
         savedCount={savedReports.length}
       />
 
       <main className="app-main">
         {activeTab === 'main' && (
           <div className="animate-fade-in">
+            {!llmConfigured && (
+              <div className="alert-banner" onClick={() => setActiveTab('settings')} style={{ cursor: 'pointer' }}>
+                <span>🔑 AI 요약 기능을 사용하려면 <strong>설정 탭</strong>에서 OpenAI API Key를 등록해주세요 →</span>
+              </div>
+            )}
             <ScrapePanel
               onScrape={handleScrape}
               loading={loading}
               smtpConfigured={smtpConfigured}
+              llmConfigured={llmConfigured}
             />
             {loading && (
               <div className="loading-card animate-fade-in">
@@ -170,8 +194,9 @@ export default function App() {
 
         {activeTab === 'settings' && (
           <div className="animate-fade-in">
-            <SmtpConfig
-              onSaved={handleSmtpSaved}
+            <Settings
+              onLlmSaved={handleLlmSaved}
+              onSmtpSaved={handleSmtpSaved}
               showToast={showToast}
             />
           </div>
