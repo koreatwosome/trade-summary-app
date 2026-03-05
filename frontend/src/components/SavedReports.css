@@ -1,0 +1,236 @@
+.saved-reports {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.reports-header {
+  padding: 24px 28px;
+  background: linear-gradient(135deg, #f0f6ff, #e8f1fb);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.reports-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 4px;
+}
+
+.reports-header p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.reports-header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.header-email-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.header-email-input {
+  padding: 7px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  font-size: 13px;
+  outline: none;
+  width: 220px;
+}
+
+.header-email-input:focus {
+  border-color: var(--primary-light);
+}
+
+.refresh-btn {
+  background: white;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.refresh-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 24px;
+  gap: 8px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.empty-state span {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.reports-list {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.report-card {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.report-card:hover {
+  box-shadow: var(--shadow);
+}
+
+.report-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  cursor: pointer;
+  background: #f8fafc;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.report-card-header:hover {
+  background: #eef4fb;
+}
+
+.report-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.report-date {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.report-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.report-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.card-action-btn {
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-action-btn.email {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.card-action-btn.email:hover:not(:disabled) {
+  background: #16a34a;
+  color: white;
+}
+
+.card-action-btn.email:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card-action-btn.expand {
+  background: white;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.card-action-btn.expand:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.spinner-xs {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid rgba(21, 128, 61, 0.3);
+  border-top-color: #15803d;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+.report-body {
+  padding: 20px 24px;
+  background: white;
+  border-top: 1px solid var(--border);
+}
+
+.report-summary {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.report-footer {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.report-footer a {
+  color: var(--primary-light);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.report-footer a:hover {
+  text-decoration: underline;
+}
