@@ -78,3 +78,17 @@
   font-size: 11px;
   opacity: 0.8;
 }
+
+.nav-btn--alert .nav-desc {
+  color: #fbbf24;
+  opacity: 1;
+}
+
+.nav-btn--alert:not(.active) {
+  animation: pulse-alert 2s infinite;
+}
+
+@keyframes pulse-alert {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}

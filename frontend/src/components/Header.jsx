@@ -1,11 +1,20 @@
 import React from 'react'
 import './Header.css'
 
-export default function Header({ activeTab, setActiveTab, smtpConfigured, savedCount }) {
+export default function Header({ activeTab, setActiveTab, smtpConfigured, llmConfigured, savedCount }) {
   const tabs = [
     { id: 'main', label: '📊 요약 분석', desc: '최신 보도자료 분석' },
     { id: 'history', label: '📁 저장 보고서', desc: `${savedCount}건` },
-    { id: 'settings', label: '⚙️ 이메일 설정', desc: smtpConfigured ? '설정됨 ✅' : '미설정' },
+    {
+      id: 'settings',
+      label: '⚙️ 설정',
+      desc: llmConfigured && smtpConfigured
+        ? 'AI & 이메일 ✅'
+        : llmConfigured
+        ? 'AI ✅ / 이메일 미설정'
+        : '설정 필요 ⚠️',
+      alert: !llmConfigured,
+    },
   ]
 
   return (
@@ -22,7 +31,7 @@ export default function Header({ activeTab, setActiveTab, smtpConfigured, savedC
           {tabs.map(tab => (
             <button
               key={tab.id}
-              className={`nav-btn ${activeTab === tab.id ? 'active' : ''}`}
+              className={`nav-btn ${activeTab === tab.id ? 'active' : ''} ${tab.alert ? 'nav-btn--alert' : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
               <span className="nav-label">{tab.label}</span>

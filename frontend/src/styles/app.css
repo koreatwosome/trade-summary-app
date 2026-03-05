@@ -13,6 +13,26 @@
   padding: 24px 16px 48px;
 }
 
+/* Alert Banner */
+.alert-banner {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  color: #92400e;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.alert-banner:hover {
+  background: linear-gradient(135deg, #fde68a, #fbbf24);
+}
+
 /* Loading Card */
 .loading-card {
   background: var(--card-bg);

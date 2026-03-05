@@ -1,0 +1,351 @@
+/* ─────────────────────────── 컨테이너 ─────────────────────────── */
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-page-header {
+  margin-bottom: 4px;
+}
+
+.settings-page-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary-dark, #1a3c5e);
+  margin-bottom: 6px;
+}
+
+.settings-page-header p {
+  font-size: 14px;
+  color: var(--text-muted, #64748b);
+}
+
+/* ─────────────────────────── 섹션 카드 ─────────────────────────── */
+.settings-section {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius, 12px);
+  padding: 24px;
+  box-shadow: var(--shadow, 0 2px 8px rgba(0,0,0,0.06));
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ─────────────────────────── 섹션 헤더 ─────────────────────────── */
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.section-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.section-head > div {
+  flex: 1;
+}
+
+.section-head h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary-dark, #1a3c5e);
+  margin-bottom: 4px;
+}
+
+.section-head p {
+  font-size: 13px;
+  color: var(--text-muted, #64748b);
+}
+
+.badge-ok {
+  background: #dcfce7;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ─────────────────────────── 상태 카드 ─────────────────────────── */
+.status-card {
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.status-card--ok {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.status-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.status-row span {
+  color: #64748b;
+  min-width: 72px;
+  flex-shrink: 0;
+}
+
+.status-row code {
+  background: rgba(0,0,0,0.06);
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-family: 'Menlo', monospace;
+  font-size: 12px;
+  color: #1e293b;
+}
+
+.url-code {
+  font-size: 11px !important;
+  word-break: break-all;
+}
+
+/* ─────────────────────────── 폼 ─────────────────────────── */
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text, #1e293b);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.label-hint {
+  font-weight: 400;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.form-group input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text, #1e293b);
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-light, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.fg-grow {
+  flex: 1;
+}
+
+/* ─────────────────────────── 프리셋 칩 ─────────────────────────── */
+.preset-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preset-row.wrap {
+  flex-wrap: wrap;
+}
+
+.preset-chip {
+  padding: 6px 14px;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--text-muted, #64748b);
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.preset-chip:hover {
+  border-color: var(--primary-light, #3b82f6);
+  color: var(--primary, #2563eb);
+  background: #eff6ff;
+}
+
+.preset-chip.active {
+  border-color: var(--primary-light, #3b82f6);
+  background: var(--primary, #2563eb);
+  color: white;
+  font-weight: 600;
+}
+
+/* ─────────────────────────── 비밀번호 토글 ─────────────────────────── */
+.input-with-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-toggle input {
+  padding-right: 44px !important;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  color: #94a3b8;
+}
+
+.eye-btn:hover {
+  color: #475569;
+}
+
+/* ─────────────────────────── 가이드 박스 ─────────────────────────── */
+.guide-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13px;
+}
+
+.guide-box strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #1e293b;
+}
+
+.guide-box ol {
+  padding-left: 20px;
+  margin: 0 0 8px;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.guide-box a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.guide-box a:hover {
+  text-decoration: underline;
+}
+
+.guide-note {
+  color: #f59e0b;
+  font-size: 12px;
+  margin: 0;
+  margin-top: 8px;
+}
+
+.guide-box--yellow {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+/* ─────────────────────────── 버튼 ─────────────────────────── */
+.btn-primary-full {
+  width: 100%;
+  height: 44px;
+  background: linear-gradient(135deg, var(--primary, #2563eb), var(--primary-light, #3b82f6));
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-primary-full:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btn-primary-full:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-danger-sm {
+  padding: 6px 14px;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.btn-danger-sm:hover:not(:disabled) {
+  background: #fecaca;
+}
+
+.btn-danger-sm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─────────────────────────── 스피너 ─────────────────────────── */
+.spinner-sm {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
