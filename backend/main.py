@@ -16,6 +16,8 @@ import pdfplumber
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from openai import OpenAI
 
@@ -637,6 +639,26 @@ async def delete_llm_config():
     if os.path.exists(LLM_CONFIG_FILE):
         os.remove(LLM_CONFIG_FILE)
     return {"success": True}
+
+
+# ─── 프론트엔드 정적 파일 서빙 ──────────────────────────────────────────────────
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+STATIC_DIR = os.path.normpath(STATIC_DIR)
+
+if os.path.isdir(STATIC_DIR):
+    app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_DIR, "assets")), name="assets")
+
+    @app.get("/")
+    async def serve_index():
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        # API 요청은 위에서 처리됨; 나머지는 SPA index.html 반환
+        file_path = os.path.join(STATIC_DIR, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
 if __name__ == "__main__":
